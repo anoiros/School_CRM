@@ -11,11 +11,8 @@ Route::post('login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
 
 Route::get('/', function () {
-    return response()->json(['message' => 'API Laravel OK ✅']);
+    return response()->json(['message' => 'API Laravel OK ']);
 });
 
-Route::get('/test', function () {
-    return response()->json(['message' => 'API Laravel OK ✅']);
-});
 
 
