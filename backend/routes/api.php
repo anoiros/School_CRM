@@ -1,8 +1,21 @@
 <?php
 
-use Illuminate\Http\Request;
+use Illuminate\Routing;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route de connexion pour l'authentification (Login)
+Route::post('login', [AuthController::class, 'login']);
+
+// Route de déconnexion (Logout), nécessite un token valide
+Route::middleware('auth:sanctum')->post('logout', [AuthController::class, 'logout']);
+
+Route::get('/', function () {
+    return response()->json(['message' => 'API Laravel OK ✅']);
+});
+
+Route::get('/test', function () {
+    return response()->json(['message' => 'API Laravel OK ✅']);
+});
+
+
