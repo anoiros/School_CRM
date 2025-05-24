@@ -5,25 +5,37 @@ import api from '../../services/axios';
 const Delete = ({head , selectedRow, handleClose, apiEndpoint, onSuccess} ) => {
 
     const [loading, setLoading] = useState(false); 
+    const [message, setMessage] = useState(null);
+    const [isDone, setIsDone] = useState(null);
 
     const handleConfirm = async () => {
         try {
             setLoading(true); // Démarrer le chargement
             const response = await api.delete(`${apiEndpoint}/${selectedRow.id}`);
-            onSuccess(response);
-            // Afficher un message de succès
+            setIsDone(true);
+            setMessage("Données supprimer avec succès");
             console.log('Données supprimer avec succès :', response.data);
-            alert("Données supprimer avec succès");
-            window.location.reload(); 
         } catch (error) {
+            setIsDone(false);
             const errorMessage = error.response?.data?.message || 'Erreur inconnue';
             console.error('Erreur lors de la suppression des données :', error);
-            alert("Erreur lors de la suppression des données : " + errorMessage);
+            setMessage("Erreur lors de la suppression des données : " + errorMessage);
         } finally {
             setLoading(false); // Arrêter le chargement
         }
-        
     };
+
+    const Fermer = () => {
+        if(isDone){
+            setMessage(null);
+            setIsDone(null);
+            onSuccess();
+            handleClose();
+            return;
+        }
+        setMessage(null);
+        setIsDone(null);
+    }
 
     return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -70,6 +82,23 @@ const Delete = ({head , selectedRow, handleClose, apiEndpoint, onSuccess} ) => {
                 </button>
             </div>
         </div>
+        {message && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> 
+                <div className="bg-white p-10 rounded shadow-xl w-full max-w-xl">
+                    <h2 className="text-lg font-bold mb-2 flex justify-center text-red-600">  Message </h2>
+                    <div className="flex justify-center mt-4 space-x-4">
+                        <span>
+                            {message}
+                        </span>
+                    </div>
+                    <div className="flex justify-center mt-4 space-x-4">
+                        <button onClick={() => Fermer()} className="mt-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                            Ok
+                        </button>
+                    </div>
+                </div>
+            </div>
+            )}
     </div>
     )
 }

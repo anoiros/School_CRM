@@ -10,13 +10,12 @@ import GlobalPage from './layouts/GlobalPage';
 import { AdminSideBar } from './SideBarLists/AdminSideBar';
 import AdminDashboard from './Admin/Dashboard';
 import AdminStudents from './Admin/Students';
+import AdminGrades from './Admin/Grades';
 import AdminTeachers from './Admin/Teachers';
 import AdminClasses from './Admin/Classes';
 import AdminSubjects from './Admin/Subjects';
 import AdminUsers from './Admin/Users';
 import AdminLogs from './Admin/Logs';
-import AdminExport from './Admin/Export';
-import AdminSettings from './Admin/Settings';
 
 // composants Teacher
 import { TeacherSideBar } from './SideBarLists/TeacherSideBar';
@@ -25,7 +24,6 @@ import TeacherClasses from './Teacher/Classes';
 import TeacherClassDetails from './Teacher/ClasseDetails';
 import TeacherSubjects from './Teacher/Subjects';
 import TeacherNotes from './Teacher/Notes';
-import TeacherExport from './Teacher/Export';
 
 
 //composants Student
@@ -39,6 +37,7 @@ import StudentBulletin from './Student/Bulletin';
 // composants globales
 import Home from './pages/Home';
 import Unauthorized from './components/Unauthorized';
+import EditProfile from './components/EditProfil';
 
 
 
@@ -56,13 +55,12 @@ const App = () => {
         }>
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="students" element={<AdminStudents />} />
+        <Route path="students/:id/grades" element={<AdminGrades />} />
         <Route path="teachers" element={<AdminTeachers />} />
         <Route path="classes" element={<AdminClasses />} />
         <Route path="subjects" element={<AdminSubjects />} />
         <Route path="users" element={<AdminUsers />} />
-        <Route path="logs" element={<AdminLogs />} />
-        <Route path="export" element={<AdminExport />} />
-        <Route path="settings" element={<AdminSettings />} />
+        <Route path="logs" element={<AdminLogs lastest={false} />} />
       </Route>
 
       <Route path="/teacher" element={
@@ -75,7 +73,6 @@ const App = () => {
         <Route path="classes/:id" element={<TeacherClassDetails />} />
         <Route path='subjects' element={<TeacherSubjects />}/>
         <Route path='notes' element={<TeacherNotes />}/>
-        <Route path='export' element={<TeacherExport />} />
       </Route>
 
       <Route path="/student" element={
@@ -90,6 +87,7 @@ const App = () => {
       </Route>
     
       <Route path="/unauthorized" element={<Unauthorized />} />
+      <Route path="/profil" element={<EditProfile/>} />
     </Routes>
   );
 };

@@ -4,7 +4,11 @@ import api from '../../services/axios';
 
 const Update = ({head , selectedRow, handleClose, apiEndpoint, onSuccess}) => {
 
-    // Vérifier si le formulaire est valide
+    const [formData, setFormData] = useState(selectedRow);
+    const [loading, setLoading] = useState(false); 
+    const [message, setMessage] = useState(null);
+    const [isDone, setIsDone] = useState(null);
+
     const isValidForm = (formData) => {
         for (const key in formData) {
             if (formData[key] === "" || formData[key] === null) {
@@ -13,11 +17,7 @@ const Update = ({head , selectedRow, handleClose, apiEndpoint, onSuccess}) => {
         }
         return true; // Tous les champs sont remplis
     };
-    // formulaire a envoyer
-    const [formData, setFormData] = useState(selectedRow);
-
-    // Pour gérer le chargement
-    const [loading, setLoading] = useState(false); 
+ 
 
     // initialiser le formulaire
     useEffect(() => {
@@ -46,19 +46,30 @@ const Update = ({head , selectedRow, handleClose, apiEndpoint, onSuccess}) => {
 
             setLoading(true); // Démarrer le chargement
             const response = await api.put(`${apiEndpoint}/${formData.id}`, formData);
-            onSuccess(response);
+            setIsDone(true);
+            setMessage("Données mises à jour avec succès");
             console.log('Données mises à jour avec succès :', response.data);
-            alert("Données mises à jour avec succès");
-            handleClose();
         } catch (error) {
+            setIsDone(false);
             const errorMessage = error.response?.data?.message || 'Erreur inconnue';
             console.error('Erreur lors de la mise à jour des données :', error);
-            alert("Erreur lors de la mise à jour des données : " + errorMessage);
+            setMessage("Erreur lors de la mise à jour des données : " + errorMessage);
         } finally {
             setLoading(false); // Arrêter le chargement
-            
         }
     };
+
+    const Fermer = () => {
+        if(isDone){
+            setMessage(null);
+            setIsDone(null);
+            onSuccess();
+            handleClose();
+            return;
+        }
+        setMessage(null);
+        setIsDone(null);
+    }
 
 
     return (
@@ -118,6 +129,23 @@ const Update = ({head , selectedRow, handleClose, apiEndpoint, onSuccess}) => {
                 </button>
             </div>
         </div>
+        {message && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> 
+                <div className="bg-white p-10 rounded shadow-xl w-full max-w-xl">
+                    <h2 className="text-lg font-bold mb-2 flex justify-center text-red-600">  Message </h2>
+                    <div className="flex justify-center mt-4 space-x-4">
+                        <span>
+                            {message}
+                        </span>
+                    </div>
+                    <div className="flex justify-center mt-4 space-x-4">
+                        <button onClick={() => Fermer()} className="mt-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                            Ok
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
     </div>
   );
 }

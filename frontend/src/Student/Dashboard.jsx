@@ -6,7 +6,6 @@ import Stats from '../layouts/Stats';
 const Dashboard = () => {
 
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [data, setData] = useState(null);
@@ -14,13 +13,6 @@ const Dashboard = () => {
     const [classe, setClasse] = useState(null);
   
     useEffect(() => {
-      const storedUser = localStorage.getItem('user');
-      if (!storedUser || storedUser === "undefined") {
-        navigate('/');
-      }
-      if (storedUser) {
-        setUser(JSON.parse(storedUser));
-      }
   
       const fetch = async () => {
         try {
@@ -39,9 +31,6 @@ const Dashboard = () => {
   
       fetch();
     }, [navigate]);
-    
-    // Si l'utilisateur n'est pas authentifié, rediriger vers la page de login
-    if (!user) return (navigate('/'));
   
     // Si les données sont en cours de chargement
     if (loading) {

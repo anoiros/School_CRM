@@ -10,9 +10,10 @@ use App\Http\Controllers\API\StudentController;
 use App\Http\Controllers\API\ClassController;
 use App\Http\Controllers\API\SubjectController;
 use App\Http\Controllers\API\NoteController;
+use App\Http\Controllers\Pages\AdminPageController;
 use App\Http\Controllers\API\UsersController;
 use App\Http\Controllers\Pages\StudentPageController;
-use App\Models\Student;
+
 
 // Routes protégées
 Route::middleware('auth:api','is_admin')->group(function () {
@@ -21,13 +22,16 @@ Route::middleware('auth:api','is_admin')->group(function () {
     Route::apiResource('students', StudentController::class);
     Route::apiResource('classes', ClassController::class);
     Route::apiResource('subjects', SubjectController::class);
+    Route::get('/audit-logs', [AdminPageController::class, 'auditLogs']);
+    Route::get('/audit-logs/latest', [AdminPageController::class, 'latestAuditLogs']);
+    Route::get('/admin/student/{studentId}', [AdminPageController::class, 'StudentGrade']);
+    Route::get('/studentsList', [AdminPageController::class, 'studentsList']);
 });
 
 // Routes Statistiques
 Route::middleware(['auth:api','is_admin'])->group(function () {
     Route::get('/stats', [StatsController::class, 'stats']);
     Route::get('/stats/grades', [StatsController::class, 'gradesDistribution']);
-
     Route::get('/select/userTeachers', [SelectController::class, 'userTeachers']);
     Route::get('/select/teachers', [SelectController::class, 'teachers']);
     Route::get('/select/classes', [SelectController::class, 'classes']);
@@ -42,6 +46,7 @@ Route::middleware(['auth:api','is_teacher'])->group(function() {
     Route::put('/teacher/grades', [TeacherPageController::class, 'StoreGrade']);
     Route::get('/teacher/notes', [TeacherPageController::class, 'MyNotes']);
     Route::get('/teacher/MyStudents', [TeacherPageController::class, 'AllMyStudents']);
+    Route::get('/teacher/export', [TeacherPageController::class, 'exportData']);
 });
 
 Route::middleware(['auth:api','is_student'])->group(function() {
@@ -57,3 +62,5 @@ Route::middleware(['auth:api','is_admin_or_teacher'])->apiResource('notes', Note
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->post('/logout', [AuthController::class, 'logout']);
+
+Route::middleware('auth:api')->post('/profil', [AuthController::class, 'profil']);

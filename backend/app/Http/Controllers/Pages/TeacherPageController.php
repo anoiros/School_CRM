@@ -10,6 +10,7 @@ use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\Grade;
 use App\Models\Note;
+use App\Services\AuditLogger;
 use Illuminate\Http\Request;
 
 class TeacherPageController extends Controller
@@ -77,10 +78,11 @@ class TeacherPageController extends Controller
 
         $grade = Grade::updateOrCreate(
             ['student_id' => $validated['id'], 'subject_id' => $validated['subject_id']],
-            ['grade' => $validated['grade']]
+            ['grade' => $validated['grade']],
         );
 
         if ($grade) {
+            AuditLogger::onCustomAction('update or create', 'grade', $grade->id);
             return response()->json(['message' => 'Note enregistrée avec succès'], 200);
         } else {
             return response()->json(['message' => 'Erreur lors de l\'enregistrement de la note'], 500);
@@ -119,5 +121,42 @@ class TeacherPageController extends Controller
             ];
         });
         return response()->json($box);
+    }
+
+    public function exportData()
+    {
+        $teacherId = Teacher::where('user_id', Auth::id())->value('id');
+        $classes = Classe::where('teacher_id', $teacherId)->get();
+        $students = Student::whereIn('class_id', $classes->pluck('id'))->with('user')->get();
+
+        $students = $classes->map(function($student){
+            return [
+                'id' => $student->id,
+                'name' => $student->user->name ?? '',
+                'email' => $student->user->email ?? '',
+                'DDN' => $student->date_of_birth ?? '',
+            ];
+        });
+
+        $subjects = Subject::whereIn('class_id', $classes->pluck('id'))->with('grades')->get();
+        $subjects = $subjects->map(function($subject) {
+            return [
+                'id' => $subject->id,
+                'name' => $subject->name ?? '',
+                'class_id' => $subject->class_id ?? '',
+                'class_name' => $subject->class->name ?? '',
+                'class_section' => $subject->class->section ?? '',
+                'average_grade' => round($subject->grades->avg('grade'), 2) ?? 0,
+            ];
+        });
+
+
+        $data = [
+            'classes' => $classes,
+            'students' => $students,
+            'subjects' => $subjects,
+        ];
+
+        return response()->json($data);
     }
 }

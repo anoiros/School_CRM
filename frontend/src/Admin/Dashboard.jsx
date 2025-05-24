@@ -4,29 +4,18 @@ import Stats from '../layouts/Stats';
 import Chart from './Dashboard/Chart';
 import LinkButton from './Dashboard/LinkButton';
 import QuickActions from './Dashboard/QuickActions';
+import Logs from './Logs';
 import api from '../services/axios';
 
 const Dashboard = () => {
 
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);
     const [stats, setStats] = useState(null);
     const [data, setData] = useState([null]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('token');
-
-        if (!storedUser || storedUser === "undefined") {
-            navigate('/');
-        }
-        
-        if (storedUser && storedToken) {
-            setUser(JSON.parse(storedUser));
-        }
-
         // Appel API pour récupérer les statistiques
         const fetch = async () => {
             try {
@@ -46,9 +35,6 @@ const Dashboard = () => {
 
         fetch();
     }, [navigate]);
-
-    // Si l'utilisateur n'est pas authentifié, rediriger vers la page de login
-    if (!user) return (navigate('/'));
 
     // Si les données sont en cours de chargement
     if (loading) {
@@ -94,15 +80,19 @@ const Dashboard = () => {
                 {/* Affichage des actions rapides */}
                 <div className=' w-1/2 p-5'>
                     <QuickActions>
-                        <LinkButton to="/admin/users/add" icon="👤">Ajouter un utilisateur</LinkButton>
-                        <LinkButton to="/admin/students/add" icon="👩‍🎓">Ajouter un étudiant</LinkButton>
-                        <LinkButton to="/admin/teachers/add" icon="👨‍🏫">Ajouter un enseignant</LinkButton>
-                        <LinkButton to="/admin/classes/add" icon="🏫">Créer une classe</LinkButton>
-                        <LinkButton to="/admin/subjects/add" icon="📘">Ajouter une matière</LinkButton>
+                        <LinkButton to="/admin/users" icon="👤">Ajouter un utilisateur</LinkButton>
+                        <LinkButton to="/admin/students" icon="👩‍🎓">Ajouter un étudiant</LinkButton>
+                        <LinkButton to="/admin/teachers" icon="👨‍🏫">Ajouter un enseignant</LinkButton>
+                        <LinkButton to="/admin/classes" icon="🏫">Créer une classe</LinkButton>
+                        <LinkButton to="/admin/subjects" icon="📘">Ajouter une matière</LinkButton>
                     </QuickActions>
                 </div>
-            </div>          
-              
+            </div>   
+
+            {/* Affichage des dernières actions */}
+            <div className=' w-full p-5'>
+                <Logs lastest = {true} />
+            </div>
         
         </>
     );

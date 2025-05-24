@@ -74,7 +74,7 @@ const Classes = () => {
 
     return (
         <>
-            <TableCRUD head={head} content={data} apiEndpoint={"/classes"}>
+            <TableCRUD head={head} content={data} apiEndpoint={"/classes"} exportData={true}>
                 Liste des Enseignants
             </TableCRUD>
         </>

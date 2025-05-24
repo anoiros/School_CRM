@@ -71,7 +71,7 @@ const Notes = () => {
 
   return (
     <>
-    <TableCRUD head={head} content={data} apiEndpoint={"/notes"}>
+    <TableCRUD head={head} content={data} apiEndpoint={"/notes"} exportData={true}>
       Liste de mes remarques
     </TableCRUD>
     </>

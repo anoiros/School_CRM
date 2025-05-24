@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Note;
 use App\Models\Teacher;
+use App\Services\AuditLogger;
 
 class NoteController extends Controller
 {
@@ -39,6 +40,7 @@ class NoteController extends Controller
         ]);
 
         if($note) {
+            AuditLogger::onCreate('note', $note->id);
             return response()->json(['message' => 'Remarque ajouté avec succès']);
         }else {
             return response()->json(['message' => 'Erreur lors de l\'ajout de la remarque'], 500);
@@ -72,6 +74,7 @@ class NoteController extends Controller
         $note->category = $validated['category'];
 
         if ($note->save()) {
+            AuditLogger::onUpdate('note', $note->id);
             return response()->json(['message' => 'Remarque mise à jour avec succès']);
         } else {
             return response()->json(['message' => 'Erreur lors de la mise à jour de la remarque'], 500);
@@ -89,6 +92,7 @@ class NoteController extends Controller
         }
 
         if ($note->delete()) {
+            AuditLogger::onDelete('note', $note->id);
             return response()->json(['message' => 'Remarque supprimée avec succès']);
         } else {
             return response()->json(['message' => 'Erreur lors de la suppression de la remarque'], 500);

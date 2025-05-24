@@ -74,7 +74,7 @@ const Subjects = () => {
 
     return (
         <>
-            <TableCRUD head={head} content={data} apiEndpoint={"/subjects"}>
+            <TableCRUD head={head} content={data} apiEndpoint={"/subjects"} exportData={true}>
                 Liste des matières
             </TableCRUD>
         </>

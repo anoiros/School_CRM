@@ -5,7 +5,7 @@ const LinkButton = ({ to, children, icon }) => {
     const navigate = useNavigate();
 
     const handleClick = () => {
-        navigate(to);
+        navigate(`${to}?autoclick=true`);
     };
 
     return (

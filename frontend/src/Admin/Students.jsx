@@ -7,7 +7,6 @@ import api from '../services/axios';
 const Students = () => {
 
     const navigate = useNavigate();
-    const [user, setUser] = useState(null);
     const [data, setData] = useState([null]);
     const [userComboBox, setUserComboBox] = useState([null]);
     const [classComboBox, setClassComboBox] = useState([null]);
@@ -15,18 +14,7 @@ const Students = () => {
     const [error, setError] = useState(null); // Pour gérer les erreurs
 
     useEffect(() => {
-        const storedUser = localStorage.getItem('user');
-        const storedToken = localStorage.getItem('token');
-
-        if (!storedUser || storedUser === "undefined") {
-            navigate('/');
-        }
         
-        if (storedUser && storedToken) {
-            setUser(JSON.parse(storedUser));
-        }
-
-        // Appel API pour récupérer les étudiants
         const fetch = async () => {
             try {
                 const response = await api.get('/students');
@@ -46,8 +34,6 @@ const Students = () => {
         fetch();
     }, [navigate]);
     
-    // Si l'utilisateur n'est pas authentifié, rediriger vers la page de login
-    if (!user) return (navigate('/'));
 
     // Si les données sont en cours de chargement
     if (loading) {
@@ -78,10 +64,14 @@ const Students = () => {
         { key: "dateInscription", label: "Date d'inscription", update:true, create:true, inputType: "date", defaultValue:'2015-01-01'},
     ];
 
+    const ViewGrades = (item) => {
+        navigate(`/admin/students/${item.id}/grades`);
+    }
+
 
     return (
         <>
-        <TableCRUD head={tableHead} content={data} apiEndpoint={"/students"}>
+        <TableCRUD head={tableHead} content={data} apiEndpoint={"/students"} moreAction={ViewGrades} moreActionName={"Voir la note"} exportData={true}>
             List des étudiants
         </TableCRUD>
         </>

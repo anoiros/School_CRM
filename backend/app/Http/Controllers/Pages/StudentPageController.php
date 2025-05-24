@@ -84,6 +84,5 @@ class StudentPageController extends Controller
         return response()->json($data);
 
     }
-
 }
 

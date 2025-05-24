@@ -4,8 +4,9 @@ import api from '../services/axios';
 const Grade = ({head , selectedRow, handleClose}) => {
 
     const [formData, setFormData] = useState(selectedRow);
-    // Pour gérer le chargement
+    const [message, setMessage] = useState(null);
     const [loading, setLoading] = useState(false); 
+    const [isDone, setIsDone] = useState(null);
 
     const handleUpdate = (key, value) => {
         setFormData((prevData) => ({
@@ -14,7 +15,17 @@ const Grade = ({head , selectedRow, handleClose}) => {
         }));
     }
 
-    
+    const Fermer = () => {
+        if(isDone){
+            setMessage(null);
+            setIsDone(null);
+            handleClose();
+            window.location.reload();
+            return;
+        }
+        setMessage(null);
+        setIsDone(null);
+    }
   
     const handleSubmit = async() => {
         setLoading(true);
@@ -31,13 +42,15 @@ const Grade = ({head , selectedRow, handleClose}) => {
         try {
             const res = await api.put('/teacher/grades', formData);
             console.log('Données mises à jour avec succès :', res.data);
-            alert("Note modifiée avec succès");
-            handleClose(); // fermer la popup
-            window.location.reload();
+            setIsDone(true);
+            setMessage("Note modifiée avec succès");
         } catch (error) {
+            setIsDone(false);
             const errorMessage = error.response?.data?.message || 'Erreur inconnue';
             console.error('Erreur lors de la mise à jour des données :', error);
-            alert("Erreur lors de la mise à jour des données : " + errorMessage);
+            setMessage("Erreur lors de la mise à jour des données : " + errorMessage);
+        } finally {
+            setLoading(false); // Arrêter le chargement
         }
     };
 
@@ -80,6 +93,24 @@ const Grade = ({head , selectedRow, handleClose}) => {
                 </button>
             </div>
         </div>
+        
+        {message && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"> 
+                <div className="bg-white p-10 rounded shadow-xl w-full max-w-xl">
+                    <h2 className="text-lg font-bold mb-2 flex justify-center text-red-600">  Message </h2>
+                    <div className="flex justify-center mt-4 space-x-4">
+                        <span>
+                            {message}
+                        </span>
+                    </div>
+                    <div className="flex justify-center mt-4 space-x-4">
+                        <button onClick={() => Fermer()} className="mt-4 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                            Ok
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
     </div>
   );
 }

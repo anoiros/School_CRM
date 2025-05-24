@@ -1,27 +1,23 @@
 import React , { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/axios';
+import Stats from '../layouts/Stats';
 
 const Subjects = () => {
 
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
   const [data, setData] = useState([null]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (!storedUser || storedUser === "undefined") {
-      navigate('/');
-    }
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
 
     const fetch = async () => {
       try {
         const response = await api.get('/teacher/subjects');
+        const responseStats = await api.get('/stats/teacher');
+        setStats(responseStats.data);
         setData(response.data);
         console.log(response.data);
         setLoading(false);
@@ -34,9 +30,6 @@ const Subjects = () => {
 
     fetch();
   }, [navigate]);
-  
-  // Si l'utilisateur n'est pas authentifié, rediriger vers la page de login
-  if (!user) return (navigate('/'));
 
   // Si les données sont en cours de chargement
   if (loading) {
@@ -46,7 +39,7 @@ const Subjects = () => {
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent"></div>
           <p className="text-gray-600">Chargement de la page</p>
         </div>
-    </div>
+      </div>
     );
   }
 
@@ -58,6 +51,15 @@ const Subjects = () => {
   
   return (
     <>
+    {stats && (
+      <>
+        <div className='flex gap-4 w-full justify-center items-center'>
+          <Stats icon="🏫" total={stats.MyClasses}>Mes Classes</Stats>
+          <Stats icon="🎓" total={stats.MyStudents}>Mes Étudiants</Stats>
+          <Stats icon="📘" total={stats.MySubjects}>Mes Matières</Stats>
+        </div>
+      </>
+    )}
     <div className="flex flex-wrap">
       {data.map((subject, index) => (
         <div key={index} className="w-full sm:w-1/2 lg:w-1/3 p-2">

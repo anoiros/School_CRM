@@ -5,8 +5,6 @@ import ClassIcon from '@mui/icons-material/Class';
 import SubjectIcon from '@mui/icons-material/Subject';
 import GroupIcon from '@mui/icons-material/Group';
 import { Logs } from 'lucide-react';
-import FolderIcon from '@mui/icons-material/Folder';
-import SettingsIcon from '@mui/icons-material/Settings';
 
 
 
@@ -59,18 +57,4 @@ export const AdminSideBar = [
         icon : <Logs />,
         path : "/admin/logs",
     },
-
-    {
-        id: 8,
-        title : "Exporter des données",
-        icon : <FolderIcon />,
-        path : "/admin/export",
-    },
-
-    {
-        id: 9,
-        title : "Paramètres",
-        icon : <SettingsIcon />,
-        path : "/admin/settings",
-    }
 ]

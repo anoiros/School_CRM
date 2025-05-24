@@ -10,6 +10,7 @@ const Notes = () => {
   const [data, setData] = useState([null]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');  
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -62,16 +63,21 @@ const Notes = () => {
     { key:"category", label: "Catégorie" },
   ];
 
+  const filteredContent = data.filter(item => {
+    return head.some(({ key }) => {
+      const value = item[key];
+      if (value === null || value === undefined) return false;
+      return value.toString().toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  });
+
   return (
     <div className="p-10 shadow-md rounded-lg">
       <h1 className="text-xl font-bold mb-4">Liste des matière et notes</h1>
       <div className="overflow-x-auto shadow-md rounded-lg bg-white">
         <div className="flex justify-between items-center p-4">
           <div className="flex items-center">
-            <input type="text" placeholder="Rechercher..." className="border px-4 py-2 rounded w-72 h-12"/>
-            <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 ml-2">
-              Rechercher
-            </button>
+            <input type="text" placeholder="Rechercher..." className="border px-4 py-2 rounded w-72 h-12" value={searchTerm} onChange={e => setSearchTerm(e.target.value)}/>
           </div>
         </div>
         <table className="min-w-full border">
@@ -85,16 +91,21 @@ const Notes = () => {
             </tr>
           </thead>
           <tbody>
-            {Array.isArray(data) &&
-              data.map((item, rowIndex) => (
-                <tr key={rowIndex}>
-                  {head.map(({ key }, colIndex) => (
-                    <td key={colIndex} className="border px-4 py-2">
-                      {item[key]}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+            {Array.isArray(filteredContent) && filteredContent.length > 0 ? (
+            filteredContent.map((item, rowIndex) => (
+              <tr key={rowIndex}>
+                {head.map(({ key }, colIndex) => (
+                  <td key={colIndex} className="border px-4 py-2">
+                    {item[key]}
+                  </td>
+                ))}
+              </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={head.length + 1} className="text-center py-4">Aucun résultat trouvé</td>
+              </tr>
+            )}
           </tbody>
         </table>
     </div>

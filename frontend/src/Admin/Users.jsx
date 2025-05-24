@@ -82,7 +82,7 @@ const Users = () => {
 
     return (
         <>
-            <TableCRUD head={head} content={data} apiEndpoint={"/users"} moreAction={resetPassword} moreActionName={"Réinitialiser le MDP"}>
+            <TableCRUD head={head} content={data} apiEndpoint={"/users"} moreAction={resetPassword} moreActionName={"Réinitialiser le MDP"} exportData={true}>
                 Liste des utilisateurs
             </TableCRUD>
         </>
