@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use App\Services\AuditLogger;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+
 class AuthController extends Controller
 {
     /**
@@ -41,7 +44,13 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'Bearer',
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'photo' => $user->photo ? base64_encode($user->photo) : null
+            ]
         ]);
     }
 
@@ -92,13 +101,82 @@ class AuthController extends Controller
 
         if ($request->hasFile('photo')) {
             $photo = file_get_contents($request->file('photo')->getRealPath());
-            $user->profile_photo = $photo;
+            $user->photo = $photo;
         }
 
         if ($user->save()) {
             AuditLogger::onCustomAction('update profile', 'user', $user->id);
+
+            return response()->json([
+                'message' => 'Profil mis à jour avec succès',
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                    'photo' => $user->photo ? base64_encode($user->photo) : null
+                ]
+            ]);
         } else {
             return response()->json(['message' => 'Erreur lors de la mise à jour du profil'], 500);
         }
     }
+
+    public function verifyEmail(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur non trouvé'], 404);
+        }
+
+        $code = random_int(100000, 999999);
+
+        DB::table('password_resets_codes')->where('email', $request->email)->delete();
+        DB::table('password_resets_codes')->insert([
+            'email' => $request->email,
+            'code' => $code,
+            'created_at' => now(),
+        ]);
+
+        Mail::raw("Votre code de réinitialisation est : $code", function ($message) use ($request) {
+            $message->to($request->email)->subject('Code de réinitialisation de mot de passe');
+        });
+
+        return response()->json(['message' => 'Code envoyé par email'], 200);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'code' => 'required|string',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $record = DB::table('password_resets_codes')
+            ->where('email', $request->email)
+            ->where('code', $request->code)
+            ->first();
+
+        if (!$record) {
+            return response()->json(['error' => 'Code invalide'], 400);
+        }
+
+        if (now()->diffInMinutes($record->created_at) > 10) {
+            return response()->json(['error' => 'Code expiré'], 400);
+        }
+
+        $user = \App\Models\User::where('email', $request->email)->first();
+        $user->password = bcrypt($request->password);
+        $user->save();
+
+        DB::table('password_resets_codes')->where('email', $request->email)->delete();
+
+        return response()->json(['message' => 'Mot de passe réinitialisé avec succès']);
+    }
+
 }

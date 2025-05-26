@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './layouts/SideBar';
 import GlobalPage from './layouts/GlobalPage';
 
+
 // composants Admin
 import { AdminSideBar } from './SideBarLists/AdminSideBar';
 import AdminDashboard from './Admin/Dashboard';
@@ -38,6 +39,8 @@ import StudentBulletin from './Student/Bulletin';
 import Home from './pages/Home';
 import Unauthorized from './components/Unauthorized';
 import EditProfile from './components/EditProfil';
+import ResetPassword from './pages/ResetPassword';
+import NewPassword from './pages/NewPassword';
 
 
 
@@ -88,6 +91,8 @@ const App = () => {
     
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/profil" element={<EditProfile/>} />
+      <Route path="/ResetPassword" element={<ResetPassword />} />
+      <Route path="/ResetPassword/Reset" element={<NewPassword />} />
     </Routes>
   );
 };

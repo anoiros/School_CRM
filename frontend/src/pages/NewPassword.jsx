@@ -1,4 +1,4 @@
-import ResetPassword from "../components/ResetPassword";
+import NewPassword from "../components/NewPassword";
 
 const Reset = () => {
     return (
@@ -17,9 +17,9 @@ const Reset = () => {
                     Réinitialisation du mot de passe
                 </h3>
                 <p className="mb-4 text-sm text-gray-500 text-center">
-                    Entrez votre adresse e-mail pour réinitialiser votre mot de passe
+                    Saisissez les informations nécessaires pour réinitialiser votre mot de passe
                 </p>
-               <ResetPassword />
+               <NewPassword />
             </div>
         </div>
     </section>

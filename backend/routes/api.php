@@ -62,5 +62,5 @@ Route::middleware(['auth:api','is_admin_or_teacher'])->apiResource('notes', Note
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:api')->post('/logout', [AuthController::class, 'logout']);
-
 Route::middleware('auth:api')->post('/profil', [AuthController::class, 'profil']);
+Route::post('/reset', [AuthController::class, 'verifyEmail']);

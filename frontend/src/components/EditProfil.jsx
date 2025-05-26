@@ -9,10 +9,11 @@ const EditProfile = () => {
     const [isDone, setIsDone] = useState(null);
 
     const [formData, setFormData] = useState({
+        role: '',
         name: '',
         email: '',
         password: '',
-        confirmPassword: '',
+        password_confirmation: '',
         photo: null,
     });
 
@@ -25,6 +26,7 @@ const EditProfile = () => {
             setUser(parsedUser);
             setFormData((prev) => ({
                 ...prev,
+                role: parsedUser.role || '',
                 name: parsedUser.name || '',
                 email: parsedUser.email || '',
             }));
@@ -49,7 +51,7 @@ const EditProfile = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (formData.password !== formData.confirmPassword) {
+        if (formData.password !== formData.password_confirmation) {
             alert("Les mots de passe ne correspondent pas.");
             return;
         }
@@ -59,22 +61,30 @@ const EditProfile = () => {
             data.append('name', formData.name);
             data.append('email', formData.email);
             if (formData.password) data.append('password', formData.password);
+            if (formData.password_confirmation) data.append('password_confirmation', formData.password_confirmation);
             if (formData.photo) data.append('photo', formData.photo);
-
+            
             console.log(data);
             const res = await api.post('/profil', data, {
-                headers: { 'Content-Type': 'multipart/form-data' },
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
             });
-
-            const updatedUser = res.data;
-            localStorage.setItem('user', JSON.stringify(updatedUser));
             setIsDone(true);
-            setUser(updatedUser);
+            console.log('Réponse du serveur :', res.data.user);
+            setUser(res.data.user);
+            localStorage.setItem('user', JSON.stringify(res.data.user));
             setMessage('Profil mis à jour avec succès !');
-        } catch (error) {
-            setIsDone(false);
+        } catch (error) {setIsDone(false);
             console.error('Erreur lors de la mise à jour du profil :', error);
-            setMessage('Erreur lors de la mise à jour du profil.');
+        
+            if (error.response && error.response.data && error.response.data.errors) {
+                const serverErrors = error.response.data.errors;
+                console.log('Détails de l’erreur 422 :', serverErrors);
+                setMessage('Erreur : ' + JSON.stringify(serverErrors));
+            } else {
+                setMessage('Erreur lors de la mise à jour du profil.');
+            }
         }
     };
 
@@ -98,7 +108,7 @@ const EditProfile = () => {
 
     const Fermer = () => {
         setMessage(null);
-        if (!isDone) {
+        if (isDone) {
             navigate(-1);
         }
     };
@@ -125,7 +135,7 @@ const EditProfile = () => {
                 </div>
                 <div>
                     <label>Confirmer mot de passe</label>
-                    <input type="password" name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} className="border w-full px-3 py-2 rounded"/>
+                    <input type="password" name="password_confirmation" value={formData.password_confirmation} onChange={handleChange} className="border w-full px-3 py-2 rounded"/>
                 </div>
 
                 <div className="flex justify-between">
